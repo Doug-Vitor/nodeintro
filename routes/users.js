@@ -1,4 +1,6 @@
 let nedb = require('nedb');
+const {body, validationResult} = require('express-validator');
+
 let database = new nedb({
     filename: 'users.db',
     autoload: true,
@@ -18,10 +20,16 @@ module.exports = (app) => {
         });
     });
 
-    route.post((req, res) => {
-        database.insert(req.body, (error, user) => {
-            error ? app.utils.error.send(error, req, res) : res.status(200).json(user);
-        });
+    route.post([
+            body('name').notEmpty().withMessage("Name can't be empty"),
+            body('email').notEmpty().isEmail().withMessage("Invalid email")
+        ],
+        (req, res) => {
+
+        if (app.utils.validator.user(app, validationResult, req, res))
+            database.insert(req.body, (error, user) => {
+                error ? app.utils.error.send(error, req, res) : res.status(200).json(user);
+            });
     });
 
     let routeId = app.route('/users/:id');
