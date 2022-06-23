@@ -25,9 +25,22 @@ module.exports = (app) => {
     });
 
     let routeId = app.route('/users/:id');
+
     routeId.get((req, res) => {
         database.findOne({_id:req.params.id}).exec((error, user) => {
             error ? app.utils.error.send(error, req, res) : res.status(200).json(user);
         });
-    })
+    });
+
+    routeId.put((req, res) => {
+        database.update({_id:req.params.id}, req.body, error => {
+            error ? app.utils.error.send(error, req, res) : res.status(200).json(Object.assign(req.params, req.body));
+        });
+    });
+
+    routeId.delete((req, res) => {
+        database.remove({_id:req.params.id}, {}, error => {
+            error ? app.utils.error.send(error, req, res) : res.status(200).json(req.params);
+        });
+    });
 }
