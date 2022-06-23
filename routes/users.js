@@ -23,4 +23,11 @@ module.exports = (app) => {
             error ? app.utils.error.send(error, req, res) : res.status(200).json(user);
         });
     });
+
+    let routeId = app.route('/users/:id');
+    routeId.get((req, res) => {
+        database.findOne({_id:req.params.id}).exec((error, user) => {
+            error ? app.utils.error.send(error, req, res) : res.status(200).json(user);
+        });
+    })
 }
