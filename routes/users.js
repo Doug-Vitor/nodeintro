@@ -6,15 +6,20 @@ let database = new nedb({
 
 module.exports = (app) => {
     app.get('/users', (req, res) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json({
-            users:[{
-                name:'Fulano',
-                email:'fulano@gmail.com',   
-                id:1
-            }]
-        });
+        database.find({}).sort({name:1}).exec((error, users) => {
+            if (error) {
+                console.log(error);
+                res.status(400).json({
+                    error
+                });
+            } else {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json({
+                    users
+                })
+            }
+        })
     });
 
     app.post('/users', (req, res) => {
@@ -22,7 +27,7 @@ module.exports = (app) => {
             if (error) {
                 console.log(error);
                 res.status(400).json({
-                    error: error
+                    error
                 });
             } else {
                 res.status(200).json(user);
